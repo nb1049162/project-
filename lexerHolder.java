@@ -38,8 +38,10 @@ public class lexerHolder {
             else if (matcher.group(Token.Clas.MULTIPLY.name()) != null) {
                 tokens.add(new Token(Token.Type.MULTIPLY, matcher.group(Token.Clas.MULTIPLY.name())));
             }
-            
+ 
         }
+        //print the tokens
+
         return tokens;
     }
 }
