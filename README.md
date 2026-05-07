@@ -1,5 +1,28 @@
-hello world!!!!
-this is a repository for a mini our gcompiler project 
+hello world (^^)
+this is a repository for a our mini compiler project 
+
+REQUIREMENTS
+in order to use the compiler you bust have all of the files present in this repository 
+
+HOW TO USE 
+in the repository you will see a file called COMPILER, that is the only program you need to use
+
+the compiler takes in simple math problems and breaks them down into ther tokens, tree and result
+
+VALID AND INVALID INPUts 
+this takes in numbers and opperators such as *-+and/
+(1+1*2*3)
+3 + (4 * 2) - 7
+(1 + (2 * (3 + 4)))
+((3))
+((3 + 5) * (2 - 1)) / 4
+no letters or wierd symboles   
+
+
+
+
+
+
 
 The files required to run the project are in the repositiry you need all files 
 
