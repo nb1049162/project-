@@ -2,8 +2,9 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class lexerHolder {
-    public static ArrayList<Token> lexer(String input) {
+public class lexer {
+
+    public static ArrayList<Token> lex(String input) {
         ArrayList<Token> tokens = new ArrayList<Token>();
         StringBuffer tokenPatternsBuffer = new StringBuffer();
         //this just searches through all the classes and values
@@ -41,7 +42,7 @@ public class lexerHolder {
  
         }
         //print the tokens
-
+        
         return tokens;
     }
 }
