@@ -14,15 +14,43 @@ public class Parser {
 
     private Token consume(Token.Type type) {
         Token t = peek();
-        if (t == null || t.getTokenCLass() != type) {
-            throw new RuntimeException("Expected " + type + " but got " + t);
+        if (t == null) {
+            throw error("Unexpected end of input. Expected: " + type);
+        }
+        if (t.getTokenCLass() != type) {
+            throw error("Expected " + type + " but got " + t.getTokenCLass());
         }
         pos++;
         return t;
     }
 
+    private RuntimeException error(String message) {
+        Token t = peek();
+        String location = (t == null)
+                ? "at end of input"
+                : "at token '" + t.getValue() + "' (type " + t.getTokenCLass() + ")";
+
+        return new RuntimeException("Parse error " + location + ": " + message);
+    }
+    
+    // this is where all of the error handeling is 
     public Node parse() {
-        return parseExpr();
+        try {
+        Node result = parseExpr();
+
+        // If there are leftover tokens, that's an error
+        if (peek() != null) {
+            throw new RuntimeException("Unexpected extra tokens after valid expression");
+        }
+
+        System.out.println("Parsing successful!");
+        return result;
+
+    } catch (RuntimeException e) {
+        System.out.println("Parsing failed!");
+        System.out.println("Reason: " + e.getMessage());
+        return null;
+    }    
     }
 
     // Expr → Term ((PLUS | MINUS) Term)*
@@ -33,17 +61,20 @@ public class Parser {
             Token t = peek();
             if (t == null) break;
 
-            if (t.getTokenCLass() == Token.Type.PLUS) {
-                consume(Token.Type.PLUS);
-                Node right = parseTerm();
-                left = new BinaryOpNode("+", left, right);
+            switch (t.getTokenCLass()) {
+                case PLUS:
+                    consume(Token.Type.PLUS);
+                    left = new BinaryOpNode("+", left, parseTerm());
+                    break;
+
+                case MINUS:
+                    consume(Token.Type.MINUS);
+                    left = new BinaryOpNode("-", left, parseTerm());
+                    break;
+
+                default:
+                    return left;
             }
-            else if (t.getTokenCLass() == Token.Type.MINUS) {
-                consume(Token.Type.MINUS);
-                Node right = parseTerm();
-                left = new BinaryOpNode("-", left, right);
-            }
-            else break;
         }
 
         return left;
@@ -57,17 +88,20 @@ public class Parser {
             Token t = peek();
             if (t == null) break;
 
-            if (t.getTokenCLass() == Token.Type.MULTIPLY) {
-                consume(Token.Type.MULTIPLY);
-                Node right = parseFactor();
-                left = new BinaryOpNode("*", left, right);
+            switch (t.getTokenCLass()) {
+                case MULTIPLY:
+                    consume(Token.Type.MULTIPLY);
+                    left = new BinaryOpNode("*", left, parseFactor());
+                    break;
+
+                case DIVIDE:
+                    consume(Token.Type.DIVIDE);
+                    left = new BinaryOpNode("/", left, parseFactor());
+                    break;
+
+                default:
+                    return left;
             }
-            else if (t.getTokenCLass() == Token.Type.DIVIDE) {
-                consume(Token.Type.DIVIDE);
-                Node right = parseFactor();
-                left = new BinaryOpNode("/", left, right);
-            }
-            else break;
         }
 
         return left;
@@ -77,18 +111,29 @@ public class Parser {
     private Node parseFactor() {
         Token t = peek();
 
-        if (t.getTokenCLass() == Token.Type.NUMBER) {
-            consume(Token.Type.NUMBER);
-            return new NumberNode(Double.parseDouble(t.getValue()));
+        if (t == null) {
+            throw error("Unexpected end of input while parsing a factor");
         }
 
-        if (t.getTokenCLass() == Token.Type.LPAREN) {
-            consume(Token.Type.LPAREN);
-            Node expr = parseExpr();
-            consume(Token.Type.RPAREN);
-            return expr;
-        }
+        switch (t.getTokenCLass()) {
+            case NUMBER:
+                consume(Token.Type.NUMBER);
+                return new NumberNode(Double.parseDouble(t.getValue()));
 
-        throw new RuntimeException("Unexpected token: " + t);
+            case LPAREN:
+                consume(Token.Type.LPAREN);
+                Node expr = parseExpr();
+                if (peek() == null || peek().getTokenCLass() != Token.Type.RPAREN) {
+                    throw error("Missing closing parenthesis ')'");
+                }
+                consume(Token.Type.RPAREN);
+                return expr;
+
+            default:
+                throw error("Unexpected token in factor: " + t.getTokenCLass());
+        }
     }
 }
+
+
+
