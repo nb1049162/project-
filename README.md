@@ -1,7 +1,8 @@
 hello world!!!!
-this is a repository for a mini compiler project 
+this is a repository for a mini our gcompiler project 
 
 The files required to run the project are in the repositiry you need all files 
+
 
 
 
